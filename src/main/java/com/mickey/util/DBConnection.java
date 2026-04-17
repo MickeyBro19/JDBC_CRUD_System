@@ -8,12 +8,12 @@ public class DBConnection {
     public static final String USER="postgres";
     public static final String PASSWORD="0000";
 
-    public static Connection getConnection(){
+    public static Connection getConnection() {
         try {
-            return DriverManager.getConnection(URL,USER,PASSWORD);
-        }catch (Exception e){
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            throw new RuntimeException("Error Connecting to DB");
         }
     }
 }
