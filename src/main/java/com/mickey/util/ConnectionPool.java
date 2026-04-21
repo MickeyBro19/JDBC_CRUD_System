@@ -24,7 +24,13 @@ public class ConnectionPool {
 
     public synchronized static  Connection getConnection(){
         if(availableConnections.isEmpty()){
-            throw new RuntimeException ("No available DB Connections");
+            try{
+                System.out.println("Waiting for available Connections:...");
+                ConnectionPool.class.wait();
+
+            }catch(InterruptedException e){
+                throw new RuntimeException("Thread Interrupted",e);
+            }
 
         }
         Connection conn=availableConnections.remove(0);
@@ -39,6 +45,8 @@ public class ConnectionPool {
         availableConnections.add(conn);
 
         System.out.println("Connection released. Available: " + availableConnections.size());
+        ConnectionPool.class.notifyAll();
+
     }
 
 }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class StudentService {
     StudentDAO dao=new StudentDAO();
 
-    public Boolean AddStudent(Student student){
+    public Boolean addStudent(Student student){
         if(student.getAge()<0) {
             return false;
         }
@@ -17,22 +17,29 @@ public class StudentService {
 
     }
 
-    public ArrayList<Student> GetAllStudents() {
+    public ArrayList<Student> getAllStudents() {
         ArrayList<Student> students=dao.getAllStudents();
 
         return students;
 
     }
 
-    public Boolean UpdateStudent(Student student){
+    public Boolean updateStudent(Student student){
 
         return dao.updateStudent(student);
     }
 
-    public Boolean DeleteStudent(int id){
+    public Boolean deleteStudent(int id){
             return dao.deleteStudent(id);
 
     }
 
 
+    public Boolean bulkInsert(int num) {
+        return dao.bulkInsert(num);
+    }
+
+    public Boolean clearTable() {
+        return dao.clearTable();
+    }
 }
