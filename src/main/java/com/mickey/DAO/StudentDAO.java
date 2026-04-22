@@ -11,6 +11,7 @@ public class StudentDAO {
 
 
     public Boolean addStudent(Student student){
+
         String query="INSERT INTO students (name,age) VALUES (?,?)";
 
         Connection conn=null;
@@ -20,6 +21,7 @@ public class StudentDAO {
 
             ps.setString(1,student.getName());
             ps.setInt(2,student.getAge());
+            AppLogger.log("Processing addStudent request for: " + student.getName());
             int rows= ps.executeUpdate();
             if(rows>0){
                 AppLogger.log("Student added "+ student.getName());
@@ -43,6 +45,7 @@ public class StudentDAO {
     }
 
     public Boolean bulkInsert(int num) {
+
         String query = "INSERT INTO students (name,age) values (?,?)";
         Connection conn = null;
         PreparedStatement ps = null;
@@ -60,7 +63,7 @@ public class StudentDAO {
                 ps.setInt(2, 20 + (i % 10));
                 ps.addBatch();
             }
-
+            AppLogger.log("Starting bulk insert of " + num + " students");
             ps.executeBatch();
             conn.commit();
             long end = System.currentTimeMillis();
@@ -93,6 +96,7 @@ public class StudentDAO {
     }
 
     public ArrayList<Student> getAllStudents(){
+
         String query="Select * from students";
         ArrayList<Student> student=new ArrayList<>();
 
@@ -101,6 +105,7 @@ public class StudentDAO {
         ResultSet rs=null;
         try{ conn=ConnectionPool.getConnection();
              stmt=conn.createStatement();
+            AppLogger.log("Processing getAllStudents request");
              rs=stmt.executeQuery(query);
 
             while (rs.next()){
@@ -123,6 +128,7 @@ public class StudentDAO {
     }
 
     public Boolean updateStudent(Student student){
+
         String query="UPDATE students SET name=?,age=? WHERE id=?";
 
         Connection conn=null;
@@ -134,6 +140,7 @@ public class StudentDAO {
             ps.setString(1,student.getName());
             ps.setInt(2,student.getAge());
             ps.setInt(3,student.getId());
+            AppLogger.log("Processing updateStudent request for: " + student.getName());
             int rows= ps.executeUpdate();
             if(rows>0){
                 AppLogger.log("Student Updated "+ student.getName());
@@ -156,6 +163,7 @@ public class StudentDAO {
     }
 
     public Boolean deleteStudent(int id) {
+
         String query = "DELETE FROM students WHERE id=?";
 
         Connection conn = null;
@@ -164,6 +172,7 @@ public class StudentDAO {
             conn = ConnectionPool.getConnection();
             ps = conn.prepareStatement(query);
             ps.setInt(1, id);
+            AppLogger.log("Processing deleteStudent request for id: " + id);
             int rows= ps.executeUpdate();
             if(rows>0){
                 AppLogger.log("Student deleted with id: " + id);
@@ -193,6 +202,7 @@ public class StudentDAO {
         try{
             conn= ConnectionPool.getConnection();
             ps=conn.prepareStatement(query);
+            AppLogger.log("Starting clear table of students");
             ps.execute();
             AppLogger.log("Table cleared successfully");
             return true;

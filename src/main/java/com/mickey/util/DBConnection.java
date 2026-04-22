@@ -4,15 +4,17 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class DBConnection {
-    public static final String URL="jdbc:postgresql://localhost:5432/Student";
-    public static final String USER="postgres";
-    public static final String PASSWORD="0000";
 
     public static Connection getConnection() {
         try {
-            return DriverManager.getConnection(URL, USER, PASSWORD);
+            return DriverManager.getConnection
+                    (
+                    ConfigLoader.get("db.url"),
+                    ConfigLoader.get("db.user"),
+                    ConfigLoader.get("db.password")
+                    );
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLogger.error("Error Connecting to DB "+e);
             throw new RuntimeException("Error Connecting to DB");
         }
     }
