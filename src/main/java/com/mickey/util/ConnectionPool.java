@@ -23,7 +23,7 @@ public class ConnectionPool {
     }
 
     public synchronized static  Connection getConnection(){
-        if(availableConnections.isEmpty()){
+        while(availableConnections.isEmpty()){
             try{
                 System.out.println("Waiting for available Connections:...");
                 ConnectionPool.class.wait();
@@ -37,6 +37,7 @@ public class ConnectionPool {
         usedConnections.add(conn);
 
         System.out.println("Connection allocated. Available: " + availableConnections.size());
+        AppLogger.log("Connection allocated. Available: " + availableConnections.size());
         return conn;
     }
 
@@ -45,6 +46,7 @@ public class ConnectionPool {
         availableConnections.add(conn);
 
         System.out.println("Connection released. Available: " + availableConnections.size());
+        AppLogger.log("Connection released. Available: " + availableConnections.size());
         ConnectionPool.class.notifyAll();
 
     }

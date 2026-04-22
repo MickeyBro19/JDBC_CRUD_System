@@ -2,7 +2,7 @@ package com.mickey.DAO;
 
 import com.mickey.model.Student;
 import com.mickey.util.ConnectionPool;
-import com.mickey.util.DBConnection;
+import com.mickey.util.AppLogger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,10 +20,17 @@ public class StudentDAO {
 
             ps.setString(1,student.getName());
             ps.setInt(2,student.getAge());
-            return ps.executeUpdate()>0;
+            int rows= ps.executeUpdate();
+            if(rows>0){
+                AppLogger.log("Student added "+ student.getName());
+                return true;
+            }else {
+                AppLogger.error("Failed to add Student "+ student.getName());
+                return false;
+            }
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            AppLogger.error("DB Error in addStudent: " + e.getMessage());
             return false;
         } finally {
             if (conn != null) {
@@ -57,16 +64,19 @@ public class StudentDAO {
             ps.executeBatch();
             conn.commit();
             long end = System.currentTimeMillis();
-            System.out.println("Batch Insert Time: " + (end - start) + " ms");
+            AppLogger.log("Bulk insert completed: " + num + " records in " + (end-start) + " ms");
             conn.setAutoCommit(true);
             return true;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLogger.error("DB Error in bulkInsert: " + e.getMessage());
             try {
-                if (conn != null) conn.rollback();
+                if (conn != null) {
+                    AppLogger.error("Transaction failed. Rolling back...");
+                    conn.rollback();
+                };
             } catch (Exception rollbackEx) {
-                rollbackEx.printStackTrace();
+                AppLogger.error("Rollback failed: " + rollbackEx.getMessage());
             }
             return false;
         } finally {
@@ -97,9 +107,10 @@ public class StudentDAO {
 
                 student.add(new Student(rs.getInt("id"), rs.getString("name"),rs.getInt("age")));
             }
+            AppLogger.log("Fetched " + student.size() + " students from DB");
             return student;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            AppLogger.error("DB Error in getAllStudents: " + e.getMessage());
             return new ArrayList<>();}
         finally {
             if (conn != null) {
@@ -123,10 +134,17 @@ public class StudentDAO {
             ps.setString(1,student.getName());
             ps.setInt(2,student.getAge());
             ps.setInt(3,student.getId());
-            return ps.executeUpdate()>0;
+            int rows= ps.executeUpdate();
+            if(rows>0){
+                AppLogger.log("Student Updated "+ student.getName());
+                return true;
+            }else {
+                AppLogger.error("Failed to update Student "+ student.getName());
+                return false;
+            }
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            AppLogger.error("DB Error in updateStudent: " + e.getMessage());
             return false;}
         finally {
             try { if (ps != null) ps.close(); } catch (Exception ignored) {}
@@ -146,10 +164,17 @@ public class StudentDAO {
             conn = ConnectionPool.getConnection();
             ps = conn.prepareStatement(query);
             ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+            int rows= ps.executeUpdate();
+            if(rows>0){
+                AppLogger.log("Student deleted with id: " + id);
+                return true;
+            }else {
+                AppLogger.error("Failed to delete Student ");
+                return false;
+            }
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            AppLogger.error("DB Error in deleteStudent: " + e.getMessage());
             return false;
         } finally {
             try { if (ps != null) ps.close();} catch (Exception ignored) {}
@@ -169,10 +194,11 @@ public class StudentDAO {
             conn= ConnectionPool.getConnection();
             ps=conn.prepareStatement(query);
             ps.execute();
+            AppLogger.log("Table cleared successfully");
             return true;
 
         }catch(Exception e){
-            System.out.println(e.getMessage());
+            AppLogger.error("DB Error in clearTable: " + e.getMessage());
             return false;
         }finally{
             try { if (ps != null) ps.close();} catch (Exception ignored) {}
